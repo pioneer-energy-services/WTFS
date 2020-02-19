@@ -1,4 +1,4 @@
-#!/home/duys/py/bin/python
+#!/home/pi/py/bin/python
 """
     Flashing Station GUI uses PySimpleGUI with PySide2 Bindings to
     create a quick and simple interface to flashing certain microcontrollers

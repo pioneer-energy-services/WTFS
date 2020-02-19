@@ -1,4 +1,3 @@
-import PySide2
 import PySimpleGUI as sg
 import glob
 import sys
@@ -6,8 +5,8 @@ import subprocess
 from multiprocessing import Process
 from typing import *
 
-MAX_HEIGHT = 600
-MAX_WIDTH = 400
+MAX_HEIGHT = 400
+MAX_WIDTH = 300
 
 
 class WTFS:
@@ -45,6 +44,7 @@ class WTFS:
                     sg.PopupError(
                         f"Hex File not found for {selected_board} check to see if board exists in .boards file"
                     )
+                    continue
 
                 if len(hex_files) > 1:
                     sg.PopupError("Multiple boards found.. not acceptable")

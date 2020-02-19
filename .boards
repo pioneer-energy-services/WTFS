@@ -1,6 +1,7 @@
-TEST-BLINK,atmega328p
+UNO,atmega328p
 CMC-2-REV-0,atmega168
 CPU-P-REV-B-40,atmega644p
 CPU-P-REV-B-56,atmega644p
 CALDGHTR1-REV-C-40,atmega644p
 CALDGHTR1-REV-C-56,atmega644p
+RADII-XMIT-REV-0,attiny84
