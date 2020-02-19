@@ -1,1 +1,3 @@
-m644p> E:FC, H:DF, L:F7 m168> E:FC H:DF L:62
+atmega644p> E:FC, H:DF, L:F7
+atmega168>  E:FC, H:DF, L:62
+attiny84>
