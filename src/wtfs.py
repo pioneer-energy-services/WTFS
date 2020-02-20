@@ -39,6 +39,12 @@ class WTFS:
             if "board_selection" == event:
                 selected_board = values[event]
                 hex_files = glob.glob(f"hex/{selected_board}*.hex")
+                eeprom_files = glob.glob(f"eeprom/{selected_board}*.hex")
+
+                if len(eeprom_files) == 0:
+                    sg.Popup(
+                        f"WARNING: EEPROM Hex File not found for {selected_board}."
+                    )
 
                 if len(hex_files) == 0:
                     sg.PopupError(
@@ -46,12 +52,17 @@ class WTFS:
                     )
                     continue
 
-                if len(hex_files) > 1:
-                    sg.PopupError("Multiple boards found.. not acceptable")
+                if len(hex_files) > 1 or len(eeprom_files) > 1:
+                    sg.PopupError("Multiple hex files OR eeprom files found.")
                     sys.exit(-1)
 
                 else:
                     hex_file_path = hex_files[0]
+                    try:
+                        eeprom = eeprom_files[0]
+                    except IndexError:
+                        eeprom = None
+
                     fw_version = hex_file_path[5 + len(selected_board):-4]
                     self.window["fw_version"](f"FW: {fw_version}")
                     prgmr = "usbtiny"
@@ -62,8 +73,10 @@ class WTFS:
                         'path': hex_file_path,
                         'programmer': prgmr,
                         'board': uC,
-                        'conf': conf
+                        'conf': conf,
+                        'eeprom': eeprom
                     }
+                    print(self.cur_board)
 
             if 'detect_btn' in event:
                 if len(self.cur_board) == 0:
@@ -88,6 +101,27 @@ class WTFS:
                     sg.PopupError("Board not selected")
                     continue
 
+                    # Flash EEPROM
+                    if self.cur_board['eeprom'] is not None:
+                        sg.PopupQuickMessage("Flashing EEPROM...")
+                        _, output = subprocess.Popen(
+                            [
+                                'sudo',
+                                self.avrdude_path,
+                                f"-C{self.cur_board['conf']}",
+                                f"-c{self.cur_board['programmer']}",
+                                f"-p{self.cur_board['board']}",
+                                f"-Uflash:w:{self.cur_board['path']}:i",
+                            ],
+                            stdout=subprocess.PIPE,
+                            stdin=subprocess.PIPE,
+                            stderr=subprocess.PIPE).communicate()
+
+                    sg.PopupOK(output.decode(),
+                               keep_on_top=True,
+                               title="EEPROM Result")
+                # Flash Program
+                sg.PopupQuickMessage("Flashing Program Memory...")
                 _, output = subprocess.Popen(
                     [
                         'sudo',
@@ -101,7 +135,9 @@ class WTFS:
                     stdin=subprocess.PIPE,
                     stderr=subprocess.PIPE).communicate()
 
-                sg.PopupOK(output.decode(), keep_on_top=True, title="Result")
+                sg.PopupOK(output.decode(),
+                           keep_on_top=True,
+                           title="Program Flash Result")
         self.window.close()
 
     def __init_layout(self) -> List:
